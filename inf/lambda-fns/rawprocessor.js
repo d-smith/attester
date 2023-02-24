@@ -4,6 +4,9 @@ const web3 = new Web3();
 const { SecretsManagerClient, GetSecretValueCommand } = require("@aws-sdk/client-secrets-manager")
 const client = new SecretsManagerClient();
 
+const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
+const ddbClient = new DynamoDBClient();
+
 let secretName = process.env.SECRET_NAME;
 console.log(secretName);
 
@@ -44,6 +47,17 @@ const handler = async (event) => {
         console.log(signed);
 
         //Todo - store the txnhash, message hash, and message signature in the db
+        let putParams = {
+            TableName: 'attestations',
+            Item: {
+                msgHash: { S: messageHash },
+                txnHash: { S: payload.txnHash },
+                signature: { S: signed.signature}
+            }
+        };
+
+        let putCmd = new PutItemCommand(putParams);
+        await ddbClient.send(putCmd);
     }
 }
 

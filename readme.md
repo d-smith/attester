@@ -46,5 +46,10 @@ Inject signing key, e.g.
 
 ```
 # private key for ganache test account 10
-aws secretsmanager create-secret --name signingKey --secret-string "0xf9832eeac47db42efeb2eca01e6479bfde00fda8fdd0624d45efd0e4b9ddcd3b"
+aws secretsmanager create-secret --name sk2 --secret-string "0xf9832eeac47db42efeb2eca01e6479bfde00fda8fdd0624d45efd0e4b9ddcd3b"
 ```
+
+## Querying the table
+
+
+aws dynamodb query --table-name attestations --region us-east-1 --key-condition-expression "msgHash = :hashval" --expression-attribute-values '{":hashval":{"S":"0x60c1276a0d88019dd227999a1673a5a4ff90dbee845b1b2d6915b1516379b9a3"}}'

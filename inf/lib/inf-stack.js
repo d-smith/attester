@@ -2,7 +2,7 @@ const { Stack, Duration, CfnOutput } = require('aws-cdk-lib');
 const sqs = require('aws-cdk-lib/aws-sqs');
 const lambda = require('aws-cdk-lib/aws-lambda');
 const iam = require('aws-cdk-lib/aws-iam');
-const secrets = require('aws-cdk-lib/aws-secretsmanager');
+const dynamoDB = require('aws-cdk-lib/aws-dynamodb');
 
 const secretName = 'sk2';
 
@@ -28,6 +28,7 @@ class InfStack extends Stack {
       managedPolicies: [
         iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaSQSQueueExecutionRole'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonDynamoDBFullAccess'),
         iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite')
       ]
     })
@@ -53,6 +54,16 @@ class InfStack extends Stack {
         eventSourceArn: queue.queueArn
       }
     );
+
+    const attestations = new dynamoDB.Table(
+      this, 'attestations', {
+        partitionKey: {
+          name: "msgHash",
+          type: dynamoDB.AttributeType.STRING
+        },
+        tableName: 'attestations'
+      }
+    )
 
     new CfnOutput(this, 'qUrlOut', {
       value: queue.queueUrl,
