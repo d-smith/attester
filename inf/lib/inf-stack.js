@@ -45,11 +45,6 @@ class InfStack extends Stack {
       }
     });
 
-    //const secret = new secrets.Secret(this, 'signingSecret', {
-    //  secretName: secretName
-    //});
-
-    //secret.grantRead(myLambda);
 
     const eventSourceMapping = new lambda.EventSourceMapping(
       this, 'rawProcessorMapping', {
