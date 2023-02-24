@@ -2,6 +2,9 @@ const { Stack, Duration, CfnOutput } = require('aws-cdk-lib');
 const sqs = require('aws-cdk-lib/aws-sqs');
 const lambda = require('aws-cdk-lib/aws-lambda');
 const iam = require('aws-cdk-lib/aws-iam');
+const secrets = require('aws-cdk-lib/aws-secretsmanager');
+
+const secretName = 'sk2';
 
 class InfStack extends Stack {
   /**
@@ -24,7 +27,8 @@ class InfStack extends Stack {
       assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
         iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaSQSQueueExecutionRole'),
-        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole')
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('SecretsManagerReadWrite')
       ]
     })
 
@@ -34,8 +38,18 @@ class InfStack extends Stack {
       runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'rawprocessor.handler',
       code: lambda.Code.fromAsset('lambda-fns'),
-      role: lambdaRole
+      role: lambdaRole,
+      environment: {
+        "SECRET_NAME":secretName,
+        "SECRET_REGION": this.region
+      }
     });
+
+    //const secret = new secrets.Secret(this, 'signingSecret', {
+    //  secretName: secretName
+    //});
+
+    //secret.grantRead(myLambda);
 
     const eventSourceMapping = new lambda.EventSourceMapping(
       this, 'rawProcessorMapping', {
