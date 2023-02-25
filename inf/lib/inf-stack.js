@@ -3,6 +3,7 @@ const sqs = require('aws-cdk-lib/aws-sqs');
 const lambda = require('aws-cdk-lib/aws-lambda');
 const iam = require('aws-cdk-lib/aws-iam');
 const dynamoDB = require('aws-cdk-lib/aws-dynamodb');
+const apigw = require('aws-cdk-lib/aws-apigateway');
 
 const secretName = 'sk2';
 
@@ -64,6 +65,26 @@ class InfStack extends Stack {
         tableName: 'attestations'
       }
     )
+
+    const attestationsRole = new iam.Role(this, 'attestationsWriter', {
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonDynamoDBFullAccess')
+      ]
+    })
+
+    const apiLambda = new lambda.Function(this, 'attestApiLambda', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      functionName: 'AttestationFn',
+      handler: 'attestapi.handler',
+      code: lambda.Code.fromAsset('lambda-fns'),
+      role: attestationsRole
+    });
+
+    const api = new apigw.LambdaRestApi(this, 'attestApi', {
+      handler: apiLambda
+    });
 
     new CfnOutput(this, 'qUrlOut', {
       value: queue.queueUrl,
