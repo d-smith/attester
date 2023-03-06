@@ -10,8 +10,12 @@ This is for fun, don't deploy anywhere important.
 
 ### Infrastructure
 
+Set the AWS_REGION environment variable prior to running AWS commands.
+
 cdk deploy
 cdk destroy
+
+Note after destroy the dynamodb table will need to be deleted (see below)
 
 ### Raw Processor
 
@@ -39,6 +43,9 @@ event looks like:
     ]
 }
 ```
+## Log scraper
+
+Run ls.js using node. Note that you must set the environment variables in .env first.
 
 ## Signer
 

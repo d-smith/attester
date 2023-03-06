@@ -62,7 +62,8 @@ class InfStack extends Stack {
           name: "msgHash",
           type: dynamoDB.AttributeType.STRING
         },
-        tableName: 'attestations'
+        tableName: 'attestations',
+        billingMode: dynamoDB.BillingMode.PAY_PER_REQUEST
       }
     )
 

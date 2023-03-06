@@ -1,7 +1,8 @@
 import Web3 from 'web3';
-const web3 = new Web3('ws://127.0.0.1:8545');
+const web3 = new Web3(process.env.EVENT_ENDPOINT); // e.g. ws://127.0.0.1:8545
 
 import { SQSClient, SendMessageCommand } from "@aws-sdk/client-sqs";
+
 // Set the AWS Region.
 const REGION = "us-east-1";
 // Create SQS service object.
@@ -37,7 +38,7 @@ const processLogData = async (log) => {
 }
 
 web3.eth.subscribe('logs', {
-    address: '0xC0a4b9e04fB55B1b498c634FAEeb7C8dD5895b53',
+    address: process.env.CONTRACT_ADDRESS,
     topics: [eventSig]
 }, (error, result) => {
     if (error)
