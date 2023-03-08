@@ -84,12 +84,19 @@ class InfStack extends Stack {
     });
 
     const api = new apigw.LambdaRestApi(this, 'attestApi', {
+      restApiName: 'attestApi',
       handler: apiLambda
     });
 
-    new CfnOutput(this, 'qUrlOut', {
+    new CfnOutput(this, 'qUrl', {
       value: queue.queueUrl,
       description: 'queue url'
+    });
+
+    
+    new CfnOutput(this, 'attestApiUrl', {
+      value: api.url,
+      description: 'api url'
     });
 
 
